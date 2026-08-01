@@ -394,10 +394,4 @@ https://www.linkedin.com/in/k-prasanna-kumar/
 
 ---
 
-# 📜 License
-
-MIT License
-
----
-
 ⭐ If you found this project useful, consider giving it a star.
