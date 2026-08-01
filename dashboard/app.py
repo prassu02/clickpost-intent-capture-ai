@@ -27,7 +27,7 @@ st.markdown("### AI-Powered Buying Intent Detection Platform")
 # ==========================================================
 # Backend URL
 # ==========================================================
-API_URL = "https://clickpost-intent-capture-ai-backend1.onrender.com"
+API_URL = "https://clickpost-intent-capture-ai-1backend.onrender.com"
 
 # ==========================================================
 # Helper Function
