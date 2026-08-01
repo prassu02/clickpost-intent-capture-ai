@@ -1,0 +1,43 @@
+version: "3.9"
+
+services:
+
+  fastapi:
+    build: .
+    container_name: clickpost-api
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - .env
+
+    volumes:
+      - .:/app
+
+    command: >
+      uvicorn api.app:app
+      --host 0.0.0.0
+      --port 8000
+      --reload
+
+  streamlit:
+    build: .
+    container_name: clickpost-dashboard
+
+    depends_on:
+      - fastapi
+
+    ports:
+      - "8501:8501"
+
+    env_file:
+      - .env
+
+    volumes:
+      - .:/app
+
+    command: >
+      streamlit run dashboard/app.py
+      --server.address=0.0.0.0
+      --server.port=8501

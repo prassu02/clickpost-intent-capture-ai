@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+.env
+
+# VS Code
+.vscode/
+
+# Streamlit
+.streamlit/
+
+# macOS
+.DS_Store
+
+# CSV Output
+data/output/*.csv
+
+# Logs
+*.log
+
+# Docker
+*.pid
+
+# Pytest
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
