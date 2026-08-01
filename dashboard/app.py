@@ -24,7 +24,7 @@ st.set_page_config(
 st.title("📦 ClickPost Intent Capture Dashboard")
 st.markdown("### AI-Powered Buying Intent Detection Platform")
 
-API_URL = "http://127.0.0.1:8000"
+API_URL = "https://clickpost-intent-capture-ai.onrender.com"
 
 # ==========================================================
 # Load Data
