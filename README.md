@@ -47,6 +47,11 @@ https://clickpost-intent-capture-ai-backend-api.onrender.com/docs
 <img width="1807" height="790" alt="outreach" src="https://github.com/user-attachments/assets/deac13c4-f86d-4ed9-bc73-b96f7c1e119f" />
 
 ---
+## AI Personalized Outreach Example Response
+ 
+ <img width="1752" height="810" alt="Ai-outreach-reponse-example" src="https://github.com/user-attachments/assets/5a3ae21b-b45b-4d07-8dfe-b3cf2c85c9b9" />
+
+---
 
 # 🎯 Problem Statement
 
