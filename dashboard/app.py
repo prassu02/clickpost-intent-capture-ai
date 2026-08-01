@@ -24,37 +24,91 @@ st.set_page_config(
 st.title("📦 ClickPost Intent Capture Dashboard")
 st.markdown("### AI-Powered Buying Intent Detection Platform")
 
+# ==========================================================
+# Backend URL
+# ==========================================================
 API_URL = "https://clickpost-intent-capture-ai-backend.onrender.com"
+
+# ==========================================================
+# Helper Function
+# ==========================================================
+def load_api(endpoint):
+
+    try:
+
+        response = requests.get(
+            f"{API_URL}/{endpoint}",
+            timeout=30,
+        )
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        if isinstance(data, list):
+            return pd.DataFrame(data)
+
+        st.error(f"{endpoint} returned unexpected data.")
+        st.write(data)
+
+        return pd.DataFrame()
+
+    except Exception as e:
+
+        st.error(f"Failed to load '{endpoint}'")
+        st.error(str(e))
+
+        return pd.DataFrame()
+
 
 # ==========================================================
 # Load Data
 # ==========================================================
-try:
+ranking = load_api("ranking")
+signals = load_api("signals")
+outreach = load_api("outreach")
 
-    ranking = pd.DataFrame(
-        requests.get(f"{API_URL}/ranking").json()
-    )
-
-    signals = pd.DataFrame(
-        requests.get(f"{API_URL}/signals").json()
-    )
-
-    outreach = pd.DataFrame(
-        requests.get(f"{API_URL}/outreach").json()
-    )
-
-except Exception as e:
-
-    st.error("❌ FastAPI server is not running.")
-    st.error(str(e))
-    st.stop()
-
-# ==========================================================
-# Clean Data
-# ==========================================================
 ranking = ranking.fillna("")
 signals = signals.fillna("")
 outreach = outreach.fillna("")
+
+# ==========================================================
+# Validate Ranking Data
+# ==========================================================
+if ranking.empty:
+
+    st.warning("No Company Ranking data found.")
+
+    st.write("Ranking DataFrame")
+    st.write(ranking)
+
+    st.stop()
+
+required_columns = [
+    "company",
+    "total_score",
+]
+
+missing = [
+    c
+    for c in required_columns
+    if c not in ranking.columns
+]
+
+if missing:
+
+    st.error("Backend returned incorrect columns.")
+
+    st.write("Missing Columns")
+    st.write(missing)
+
+    st.write("Received Columns")
+    st.write(ranking.columns.tolist())
+
+    st.write("Received Data")
+    st.write(ranking)
+
+    st.stop()
 
 # ==========================================================
 # Sidebar
@@ -62,7 +116,7 @@ outreach = outreach.fillna("")
 st.sidebar.title("Dashboard Filters")
 
 company_list = ["All"] + sorted(
-    ranking["company"].unique().tolist()
+    ranking["company"].astype(str).unique().tolist()
 )
 
 selected_company = st.sidebar.selectbox(
@@ -100,45 +154,55 @@ if search:
 # ==========================================================
 filtered_signals = signals.copy()
 
-if selected_company != "All":
+if (
+    not signals.empty
+    and "company" in signals.columns
+):
 
-    filtered_signals = filtered_signals[
-        filtered_signals["company"] == selected_company
-    ]
+    if selected_company != "All":
 
-if search:
+        filtered_signals = filtered_signals[
+            filtered_signals["company"] == selected_company
+        ]
 
-    filtered_signals = filtered_signals[
-        filtered_signals["company"].str.contains(
-            search,
-            case=False,
-            na=False,
-        )
-    ]
+    if search:
+
+        filtered_signals = filtered_signals[
+            filtered_signals["company"].str.contains(
+                search,
+                case=False,
+                na=False,
+            )
+        ]
 
 # ==========================================================
 # Filter Outreach
 # ==========================================================
 filtered_outreach = outreach.copy()
 
-if selected_company != "All":
+if (
+    not outreach.empty
+    and "company" in outreach.columns
+):
 
-    filtered_outreach = filtered_outreach[
-        filtered_outreach["company"] == selected_company
-    ]
+    if selected_company != "All":
 
-if search:
+        filtered_outreach = filtered_outreach[
+            filtered_outreach["company"] == selected_company
+        ]
 
-    filtered_outreach = filtered_outreach[
-        filtered_outreach["company"].str.contains(
-            search,
-            case=False,
-            na=False,
-        )
-    ]
+    if search:
+
+        filtered_outreach = filtered_outreach[
+            filtered_outreach["company"].str.contains(
+                search,
+                case=False,
+                na=False,
+            )
+        ]
 
 # ==========================================================
-# Dashboard Metrics
+# Dashboard Summary
 # ==========================================================
 st.subheader("📊 Dashboard Summary")
 
@@ -154,10 +218,9 @@ col2.metric(
     len(signals),
 )
 
-avg_score = (
-    round(ranking["total_score"].mean(), 2)
-    if not ranking.empty
-    else 0
+avg_score = round(
+    ranking["total_score"].mean(),
+    2,
 )
 
 col3.metric(
@@ -179,14 +242,14 @@ st.subheader("🏆 Company Ranking")
 
 st.dataframe(
     filtered_ranking,
-    width="stretch",
+    use_container_width=True,
 )
 
 st.download_button(
-    label="⬇ Download Company Ranking",
-    data=filtered_ranking.to_csv(index=False),
-    file_name="company_ranking.csv",
-    mime="text/csv",
+    "⬇ Download Company Ranking",
+    filtered_ranking.to_csv(index=False),
+    "company_ranking.csv",
+    "text/csv",
 )
 
 st.divider()
@@ -196,17 +259,23 @@ st.divider()
 # ==========================================================
 st.subheader("📰 Intent Signals")
 
-st.dataframe(
-    filtered_signals,
-    width="stretch",
-)
+if filtered_signals.empty:
 
-st.download_button(
-    label="⬇ Download Signals",
-    data=filtered_signals.to_csv(index=False),
-    file_name="news_signals.csv",
-    mime="text/csv",
-)
+    st.info("No signal data available.")
+
+else:
+
+    st.dataframe(
+        filtered_signals,
+        use_container_width=True,
+    )
+
+    st.download_button(
+        "⬇ Download Signals",
+        filtered_signals.to_csv(index=False),
+        "news_signals.csv",
+        "text/csv",
+    )
 
 st.divider()
 
@@ -223,29 +292,28 @@ if not filtered_ranking.empty:
 
     st.bar_chart(chart)
 
-else:
-
-    st.info("No data available.")
-
 st.divider()
 
 # ==========================================================
-# Lead Priority Distribution
+# Priority Distribution
 # ==========================================================
 if "priority" in ranking.columns:
 
-    st.subheader("🔥 Lead Priority Distribution")
+    st.subheader("🔥 Lead Priority")
 
-    priority_counts = ranking["priority"].value_counts()
-
-    st.bar_chart(priority_counts)
+    st.bar_chart(
+        ranking["priority"].value_counts()
+    )
 
 st.divider()
 
 # ==========================================================
 # Intent Distribution
 # ==========================================================
-if "intent" in signals.columns:
+if (
+    not signals.empty
+    and "intent" in signals.columns
+):
 
     st.subheader("🥧 Intent Distribution")
 
@@ -272,13 +340,13 @@ if "intent" in signals.columns:
 st.divider()
 
 # ==========================================================
-# AI Outreach
+# Outreach
 # ==========================================================
 st.subheader("🤖 AI Personalized Outreach")
 
 if filtered_outreach.empty:
 
-    st.info("No outreach messages available.")
+    st.info("No outreach available.")
 
 else:
 
@@ -286,38 +354,33 @@ else:
 
         with st.expander(f"📧 {row['company']}"):
 
-            st.write("### AI Generated Email")
+            st.write("### Email")
 
             st.text_area(
-                label="Email",
-                value=row["email"],
-                height=260,
+                "Email",
+                row["email"],
+                height=220,
                 key=f"email_{row['company']}",
-                label_visibility="collapsed",
             )
 
-            st.write("### LinkedIn Message")
+            st.write("### LinkedIn")
 
             st.text_area(
-                label="LinkedIn",
-                value=row["linkedin"],
+                "LinkedIn",
+                row["linkedin"],
                 height=120,
                 key=f"linkedin_{row['company']}",
-                label_visibility="collapsed",
             )
 
-st.download_button(
-    label="⬇ Download Outreach CSV",
-    data=filtered_outreach.to_csv(index=False),
-    file_name="personalized_outreach.csv",
-    mime="text/csv",
-)
+    st.download_button(
+        "⬇ Download Outreach",
+        filtered_outreach.to_csv(index=False),
+        "personalized_outreach.csv",
+        "text/csv",
+    )
 
 st.divider()
 
-# ==========================================================
-# Footer
-# ==========================================================
 st.success("✅ Dashboard Loaded Successfully")
 
 st.caption(
