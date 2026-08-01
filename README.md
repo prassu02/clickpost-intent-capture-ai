@@ -10,7 +10,7 @@
 https://clickpost-intent-capture-ai-av4xntjk4qzp6bqmhvjpdf.streamlit.app/
 
 ### ⚡ FastAPI Backend
-https://clickpost-intent-capture-ai-backend-api.onrender.com
+https://clickpost-intent-capture-ai-backend-api.onrender.com/docs
 
 ### 📄 API Docs
 https://clickpost-intent-capture-ai-backend-api.onrender.com/docs
