@@ -21,27 +21,30 @@ https://clickpost-intent-capture-ai-backend-api.onrender.com/docs
 
 ## Dashboard
 
-> Replace with your dashboard screenshot
-
-![Dashboard](screenshots/dashboard.png)
+<img width="1242" height="517" alt="dashboard" src="https://github.com/user-attachments/assets/8f402e4a-b4d6-44d4-bc6e-11c920bc9c86" />
 
 ---
 
 ## Company Ranking
 
-![Ranking](screenshots/company_ranking.png)
+<img width="1180" height="687" alt="company_ranking" src="https://github.com/user-attachments/assets/f9868f49-da95-4807-8c02-847341a91ef0" />
 
 ---
 
 ## Intent Signals
 
-![Signals](screenshots/news_signals.png)
+<img width="1225" height="680" alt="News_signals" src="https://github.com/user-attachments/assets/56a55ab9-0716-4b19-9891-6e1418caad04" />
+
+---
+## Graphs
+
+<img width="1877" height="887" alt="Graphs" src="https://github.com/user-attachments/assets/900d9fe9-ac19-439c-9edd-d485c252fdfb" />
 
 ---
 
 ## AI Personalized Outreach
 
-![Outreach](screenshots/outreach.png)
+<img width="1807" height="790" alt="outreach" src="https://github.com/user-attachments/assets/deac13c4-f86d-4ed9-bc73-b96f7c1e119f" />
 
 ---
 
