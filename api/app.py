@@ -1,7 +1,5 @@
 from pathlib import Path
 import os
-import sys
-import subprocess
 
 import pandas as pd
 from fastapi import FastAPI
@@ -16,65 +14,8 @@ OUTPUT_DIR = BASE_DIR / "data" / "output"
 
 OUTPUT_DIR.mkdir(
     parents=True,
-    exist_ok=True
+    exist_ok=True,
 )
-
-REQUIRED_FILES = [
-    OUTPUT_DIR / "company_ranking.csv",
-    OUTPUT_DIR / "news_signals.csv",
-    OUTPUT_DIR / "personalized_outreach.csv",
-]
-
-# ==========================================================
-# Generate CSV Files if Missing
-# ==========================================================
-
-missing_files = [
-    file.name
-    for file in REQUIRED_FILES
-    if not file.exists()
-]
-
-if missing_files:
-
-    print("=" * 70)
-    print("Missing output files:")
-    print(missing_files)
-    print("Running main.py...")
-    print("=" * 70)
-
-    try:
-
-        subprocess.run(
-            [sys.executable, "main.py"],
-            cwd=BASE_DIR,
-            check=True
-        )
-
-        print("main.py executed successfully.")
-
-    except Exception as e:
-
-        print("Failed to generate CSV files")
-        print(e)
-
-print("=" * 70)
-print("Current Working Directory :", os.getcwd())
-print("BASE_DIR                  :", BASE_DIR)
-print("OUTPUT_DIR                :", OUTPUT_DIR)
-print("OUTPUT_DIR Exists         :", OUTPUT_DIR.exists())
-
-if OUTPUT_DIR.exists():
-
-    print("\nFiles in OUTPUT_DIR")
-
-    for file in OUTPUT_DIR.glob("*"):
-
-        print(
-            f"{file.name} ({file.stat().st_size} bytes)"
-        )
-
-print("=" * 70)
 
 # ==========================================================
 # FastAPI
@@ -82,22 +23,56 @@ print("=" * 70)
 
 app = FastAPI(
     title="ClickPost Intent Capture API",
-    version="2.0"
+    version="2.0.0",
 )
 
 # ==========================================================
-# Utility Function
+# Startup Debug
+# ==========================================================
+
+print("=" * 80)
+print("Current Working Directory :", os.getcwd())
+print("BASE_DIR                  :", BASE_DIR)
+print("OUTPUT_DIR                :", OUTPUT_DIR)
+print("OUTPUT EXISTS             :", OUTPUT_DIR.exists())
+
+if OUTPUT_DIR.exists():
+
+    print("\nFiles:")
+
+    files = list(OUTPUT_DIR.glob("*"))
+
+    if files:
+
+        for f in files:
+            print(f" - {f.name} ({f.stat().st_size} bytes)")
+
+    else:
+
+        print("No CSV files found.")
+
+print("=" * 80)
+
+
+# ==========================================================
+# Helper
 # ==========================================================
 
 def load_csv(filename: str):
 
     file = OUTPUT_DIR / filename
 
+    print("\n" + "=" * 80)
+    print("Loading:", file)
+
     if not file.exists():
 
+        print("File NOT Found")
+
         return {
+            "success": False,
             "error": f"{filename} not found",
-            "path": str(file)
+            "path": str(file),
         }
 
     try:
@@ -106,14 +81,19 @@ def load_csv(filename: str):
 
         df = df.fillna("")
 
+        print("Rows:", len(df))
+        print("Columns:", list(df.columns))
+
         return df.to_dict(orient="records")
 
     except Exception as e:
 
         return {
+            "success": False,
             "error": str(e),
-            "path": str(file)
+            "path": str(file),
         }
+
 
 # ==========================================================
 # Home
@@ -130,62 +110,38 @@ def home():
         "files": [
             {
                 "name": f.name,
-                "size": f.stat().st_size
+                "size": f.stat().st_size,
             }
             for f in OUTPUT_DIR.glob("*")
-        ]
+        ],
     }
 
-# ==========================================================
-# Debug
-# ==========================================================
-
-@app.get("/debug")
-def debug():
-
-    return {
-        "cwd": os.getcwd(),
-        "base_dir": str(BASE_DIR),
-        "output_dir": str(OUTPUT_DIR),
-        "output_exists": OUTPUT_DIR.exists(),
-        "files": [
-            {
-                "name": f.name,
-                "size": f.stat().st_size
-            }
-            for f in OUTPUT_DIR.glob("*")
-        ]
-    }
 
 # ==========================================================
-# Company Ranking
+# Ranking
 # ==========================================================
 
 @app.get("/ranking")
 def ranking():
 
-    return load_csv(
-        "company_ranking.csv"
-    )
+    return load_csv("company_ranking.csv")
+
 
 # ==========================================================
-# News Signals
+# Signals
 # ==========================================================
 
 @app.get("/signals")
 def signals():
 
-    return load_csv(
-        "news_signals.csv"
-    )
+    return load_csv("news_signals.csv")
+
 
 # ==========================================================
-# Personalized Outreach
+# Outreach
 # ==========================================================
 
 @app.get("/outreach")
 def outreach():
 
-    return load_csv(
-        "personalized_outreach.csv"
-    )
+    return load_csv("personalized_outreach.csv")
