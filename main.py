@@ -1,4 +1,5 @@
 import pandas as pd
+from pathlib import Path
 
 from config import RAW_DATA_DIR, OUTPUT_DIR
 
@@ -27,116 +28,291 @@ from generator.save_outreach import (
     save_outreach
 )
 
+
+# ==========================================================
+# Create Output Directory
+# ==========================================================
+
+OUTPUT_DIR.mkdir(
+    parents=True,
+    exist_ok=True
+)
+
+
+print("=" * 70)
+print("🚀 ClickPost Intent Capture AI Pipeline Started")
+print("=" * 70)
+
+
 # ==========================================================
 # Load Companies
 # ==========================================================
 
+company_file = RAW_DATA_DIR / "sample_accounts.csv"
+
+
+if not company_file.exists():
+
+    raise FileNotFoundError(
+        f"Company file missing: {company_file}"
+    )
+
+
 companies = load_companies(
-    RAW_DATA_DIR / "sample_accounts.csv"
+    company_file
 )
+
+
+print(
+    f"✅ Loaded Companies: {len(companies)}"
+)
+
+
+# ==========================================================
+# Collect Intent Signals
+# ==========================================================
 
 all_signals = []
 
-print("=" * 60)
-print("Collecting Intent Signals")
-print("=" * 60)
 
-# ==========================================================
-# Collect Signals
-# ==========================================================
+print("\n")
+print("=" * 70)
+print("🔎 Collecting Intent Signals")
+print("=" * 70)
+
 
 for company in companies["brand"]:
 
-    print(f"Collecting {company}")
+    print(
+        f"Collecting signals for: {company}"
+    )
 
-    signals = collect_signals(company)
+    try:
 
-    all_signals.extend(signals)
+        signals = collect_signals(company)
+
+        if signals:
+
+            all_signals.extend(signals)
+
+    except Exception as e:
+
+        print(
+            f"❌ Error collecting {company}: {e}"
+        )
+
+
+print(
+    f"\nTotal Signals Collected: {len(all_signals)}"
+)
+
+
 
 # ==========================================================
-# Save Signals
+# Save Signals CSV
 # ==========================================================
+
+signals_path = OUTPUT_DIR / "news_signals.csv"
+
 
 save_signals(
     all_signals,
-    OUTPUT_DIR / "news_signals.csv"
+    signals_path
 )
 
-signals_df = pd.DataFrame(all_signals)
+
+print(
+    f"✅ Signals Saved: {signals_path}"
+)
+
+
 
 # ==========================================================
-# Rank Companies
+# Convert Signals DataFrame
 # ==========================================================
 
-ranking = rank_companies(signals_df)
+signals_df = pd.DataFrame(
+    all_signals
+)
+
+
+if signals_df.empty:
+
+    print(
+        "⚠️ No signals found. Creating empty ranking."
+    )
+
+    ranking = pd.DataFrame(
+        columns=[
+            "company",
+            "total_score",
+            "priority",
+            "reasons"
+        ]
+    )
+
+
+else:
+
+    # ======================================================
+    # Company Ranking
+    # ======================================================
+
+    print("\n")
+    print("=" * 70)
+    print("🏆 Ranking Companies")
+    print("=" * 70)
+
+
+    ranking = rank_companies(
+        signals_df
+    )
+
+
+
+# ==========================================================
+# Save Ranking
+# ==========================================================
+
+ranking_path = OUTPUT_DIR / "company_ranking.csv"
+
 
 ranking.to_csv(
-    OUTPUT_DIR / "company_ranking.csv",
+    ranking_path,
     index=False
 )
 
-print("\nTop Companies\n")
 
-print(ranking.head(10))
+print(
+    f"✅ Ranking Saved: {ranking_path}"
+)
+
+
+print("\nTop Companies")
+
+print(
+    ranking.head(10)
+)
+
+
 
 # ==========================================================
-# Generate Personalized Outreach
+# Generate AI Outreach
 # ==========================================================
 
 print("\n")
-print("=" * 60)
-print("Top 5 Personalized Outreach")
-print("=" * 60)
+print("=" * 70)
+print("🤖 Generating AI Personalized Outreach")
+print("=" * 70)
+
 
 outreach_data = []
 
-for _, row in ranking.head(5).iterrows():
 
-    company = row["company"]
-    reasons = row["reasons"]
+if not ranking.empty:
 
-    print("\n")
-    print("=" * 60)
-    print(company)
-    print("=" * 60)
 
-    # Generate AI Email
-    email = generate_ai_email(company, reasons)
+    for _, row in ranking.head(5).iterrows():
 
-    # Generate LinkedIn Message
-    linkedin = generate_linkedin(company, reasons)
 
-    # Save for CSV
-    outreach_data.append(
-        {
-            "company": company,
-            "reasons": reasons,
-            "email": email,
-            "linkedin": linkedin
-        }
-    )
+        company = row.get(
+            "company",
+            ""
+        )
 
-    # Print Output
-    print(email)
-    print()
-    print(linkedin)
+
+        reasons = row.get(
+            "reasons",
+            ""
+        )
+
+
+        print(
+            f"\nGenerating outreach for {company}"
+        )
+
+
+        try:
+
+
+            email = generate_ai_email(
+                company,
+                reasons
+            )
+
+
+            linkedin = generate_linkedin(
+                company,
+                reasons
+            )
+
+
+            outreach_data.append(
+                {
+                    "company": company,
+                    "reasons": reasons,
+                    "email": email,
+                    "linkedin": linkedin
+                }
+            )
+
+
+        except Exception as e:
+
+
+            print(
+                f"❌ Outreach failed for {company}: {e}"
+            )
+
+
 
 # ==========================================================
 # Save Outreach
 # ==========================================================
 
+outreach_path = OUTPUT_DIR / "personalized_outreach.csv"
+
+
 save_outreach(
     outreach_data,
-    OUTPUT_DIR / "personalized_outreach.csv"
+    outreach_path
 )
 
+
+print(
+    f"✅ Outreach Saved: {outreach_path}"
+)
+
+
+
+# ==========================================================
+# Final Verification
+# ==========================================================
+
 print("\n")
-print("=" * 60)
-print("Files Saved Successfully")
-print("=" * 60)
+print("=" * 70)
+print("📁 Generated Files")
+print("=" * 70)
 
-print(f"✓ News Signals      : {OUTPUT_DIR / 'news_signals.csv'}")
-print(f"✓ Company Ranking   : {OUTPUT_DIR / 'company_ranking.csv'}")
-print(f"✓ AI Outreach       : {OUTPUT_DIR / 'personalized_outreach.csv'}")
 
-print("\nProject Completed Successfully! 🚀")
+for file in [
+    signals_path,
+    ranking_path,
+    outreach_path
+]:
+
+    print(
+        file,
+        " -> ",
+        file.exists(),
+        " -> ",
+        file.stat().st_size if file.exists() else 0,
+        "bytes"
+    )
+
+
+
+print("\n")
+print("=" * 70)
+print("🎉 ClickPost Intent Capture AI Completed Successfully!")
+print("=" * 70)
