@@ -1,313 +1,276 @@
 # 📦 ClickPost Intent Capture AI Platform
 
-> AI-powered buying intent detection platform for identifying high-potential eCommerce brands and generating personalized sales outreach.
+> AI-powered Buying Intent Detection Platform that identifies high-intent companies from public signals, ranks leads, and automatically generates personalized outreach using LLMs.
 
 ---
 
-# 🚀 Overview
+## 🚀 Live Demo
 
-The ClickPost Intent Capture AI Platform automatically discovers buying intent signals from multiple online sources, ranks companies based on their likelihood to purchase logistics software, and generates personalized AI-powered outreach emails and LinkedIn messages.
+### 🌐 Streamlit Dashboard
+https://clickpost-intent-capture-ai-av4xntjk4qzp6bqmhvjpdf.streamlit.app/
 
-This project demonstrates an end-to-end AI workflow combining web scraping, NLP-based intent detection, scoring, ranking, FastAPI, Streamlit, and Large Language Models (LLMs).
+### ⚡ FastAPI Backend
+https://clickpost-intent-capture-ai-backend-api.onrender.com
 
----
-
-# 🎯 Objectives
-
-- Collect buying intent signals from public sources
-- Identify companies showing growth or operational changes
-- Rank companies using a weighted scoring engine
-- Generate personalized outreach messages using AI
-- Visualize results in an interactive dashboard
-- Provide REST APIs for frontend integration
+### 📄 API Docs
+https://clickpost-intent-capture-ai-backend-api.onrender.com/docs
 
 ---
 
-# ✨ Features
+# 📸 Screenshots
 
-## Intent Signal Collection
+## Dashboard
 
-- Google News RSS
-- Hiring Activity
-- Reddit Mentions (Demo)
-- Company Growth Signals
+> Replace with your dashboard screenshot
 
----
-
-## AI Intent Classification
-
-Automatically detects signals such as:
-
-- Hiring
-- Expansion
-- Funding
-- Leadership Changes
-- Product Launches
-- Partnerships
-- General News
+![Dashboard](screenshots/dashboard.png)
 
 ---
 
 ## Company Ranking
 
-Each company receives:
+![Ranking](screenshots/company_ranking.png)
 
-- Intent Score
-- Signal Count
-- Primary Reason
-- Priority Level
+---
 
-Example:
+## Intent Signals
 
-| Company | Score | Priority |
-|---------|-------|----------|
-| Caraway | 65 | 🔥 Hot |
-| Chubbies | 45 | 🟡 Warm |
-| True Classic | 45 | 🟡 Warm |
+![Signals](screenshots/news_signals.png)
 
 ---
 
 ## AI Personalized Outreach
 
-Automatically generates:
-
-- Sales Email
-- LinkedIn Message
-
-using
-
-- Groq LLM
-- Llama Models
+![Outreach](screenshots/outreach.png)
 
 ---
 
-## REST API
+# 🎯 Problem Statement
 
-FastAPI endpoints:
+Sales teams spend countless hours identifying companies that may be ready to purchase logistics and shipping solutions.
 
+This platform automates that process by:
+
+- Collecting public buying intent signals
+- Ranking companies based on intent
+- Explaining why companies were scored
+- Generating AI-powered personalized outreach
+
+---
+
+# ✨ Features
+
+✅ Public signal collection
+
+✅ Buying intent detection
+
+✅ Explainable AI scoring
+
+✅ Company ranking
+
+✅ Personalized AI email generation
+
+✅ Personalized LinkedIn generation
+
+✅ FastAPI REST API
+
+✅ Interactive Streamlit Dashboard
+
+✅ Docker Deployment
+
+---
+
+# 🏗 System Architecture
+
+```text
+                  Public Sources
+             (News / RSS Feeds)
+
+                      │
+                      ▼
+
+         Signal Collection Pipeline
+        (feedparser + requests)
+
+                      │
+                      ▼
+
+           Intent Signal Extraction
+
+                      │
+                      ▼
+
+            Company Score Engine
+
+                      │
+                      ▼
+
+      AI Outreach Generator (Groq LLM)
+
+          ┌──────────────┴──────────────┐
+          ▼                             ▼
+
+ Company Ranking CSV          Outreach CSV
+
+          │
+          ▼
+
+     FastAPI Backend
+
+          │
+          ▼
+
+  Streamlit Dashboard
 ```
-GET /
-GET /ranking
-GET /signals
-GET /outreach
+
+---
+
+# 🧠 AI Workflow
+
+```text
+Company List
+      │
+      ▼
+
+Collect Public Signals
+      │
+      ▼
+
+Intent Detection
+      │
+      ▼
+
+Score Companies
+      │
+      ▼
+
+Rank Companies
+      │
+      ▼
+
+Generate AI Email
+      │
+      ▼
+
+Generate LinkedIn Message
+      │
+      ▼
+
+Dashboard + REST API
 ```
-
----
-
-## Dashboard
-
-Interactive Streamlit dashboard including:
-
-- KPI Metrics
-- Company Rankings
-- Intent Signals
-- Priority Distribution
-- Company Score Charts
-- AI Outreach Viewer
-- CSV Downloads
-
----
-
-# 🛠 Tech Stack
-
-### Backend
-
-- Python 3.11
-- FastAPI
-- Uvicorn
-
-### Dashboard
-
-- Streamlit
-- Matplotlib
-- Pandas
-
-### AI
-
-- Groq API
-- Llama Models
-
-### Data Collection
-
-- Google News RSS
-- Feedparser
-- Requests
 
 ---
 
 # 📂 Project Structure
 
-```
+```text
 clickpost-intent-capture-ai/
 │
 ├── api/
 │   ├── __init__.py
-│   └── app.py
+│   └── app.py                     # FastAPI Backend
 │
 ├── dashboard/
-│   └── app.py
+│   ├── __init__.py
+│   └── app.py                     # Streamlit Dashboard
 │
 ├── scraper/
-│   ├── jobs_scraper.py
-│   ├── news_scraper.py
-│   ├── reddit_scraper.py
-│   └── signal_collector.py
+│   ├── __init__.py
+│   └── signal_collector.py        # RSS / News Signal Collection
 │
 ├── scoring/
-│   └── score_engine.py
+│   ├── __init__.py
+│   └── score_engine.py            # Company Scoring Logic
 │
 ├── generator/
-│   ├── llm_generator.py
-│   └── outreach_generator.py
+│   ├── __init__.py
+│   ├── llm_generator.py           # AI Email Generator
+│   ├── outreach_generator.py      # LinkedIn Generator
+│   └── save_outreach.py
+│
+├── signals/
+│   ├── __init__.py
+│   └── intent_rules.py            # Buying Intent Taxonomy
 │
 ├── utils/
+│   ├── __init__.py
+│   └── helpers.py
 │
 ├── data/
+│   │
 │   ├── raw/
+│   │   ├── companies.csv
+│   │   └── sample_accounts.csv
+│   │
 │   └── output/
+│       ├── company_ranking.csv
+│       ├── news_signals.csv
+│       └── personalized_outreach.csv
 │
-├── main.py
+├── .devcontainer/
+│   └── devcontainer.json
+│
+├── .dockerignore
+├── .gitignore
+├── .env.example
+├── Dockerfile
+├── docker-compose.yml
 ├── config.py
+├── main.py                        # Run Complete AI Pipeline
 ├── requirements.txt
-├── .env
-└── README.md
+├── README.md
 ```
 
 ---
 
-# ⚙ Installation
+# ⚙ Tech Stack
 
-Clone the repository
+### Backend
 
-```bash
-git clone https://github.com/yourusername/clickpost-intent-capture-ai.git
+- FastAPI
+- Uvicorn
 
-cd clickpost-intent-capture-ai
-```
+### Frontend
 
-Create virtual environment
+- Streamlit
 
-Windows
+### AI
 
-```bash
-python -m venv venv
+- Groq LLM
 
-venv\Scripts\activate
-```
+### Data
 
-Linux / macOS
+- Pandas
+- NumPy
 
-```bash
-python3 -m venv venv
+### Data Sources
 
-source venv/bin/activate
-```
+- RSS Feeds
+- News Sources
 
-Install dependencies
+### Deployment
 
-```bash
-pip install -r requirements.txt
-```
+- Docker
+- Render
+- Streamlit Cloud
 
 ---
 
-# 🔑 Environment Variables
+# 📊 Output Files
 
-Create a `.env` file.
-
-Example
-
-```text
-GROQ_API_KEY=your_groq_api_key
-
-OPENAI_API_KEY=
-
-NEWS_API_KEY=
-
-REDDIT_CLIENT_ID=
-
-REDDIT_CLIENT_SECRET=
-
-REDDIT_USER_AGENT=clickpost-intent-bot
-
-MAX_RESULTS=10
-
-TOP_ACCOUNTS=5
-```
-
-Only **GROQ_API_KEY** is required for the current implementation.
-
----
-
-# ▶ Running the Project
-
-## Step 1
-
-Generate signals and rankings
-
-```bash
-python main.py
-```
-
-Output
+Generated automatically
 
 ```
-news_signals.csv
-
 company_ranking.csv
+
+news_signals.csv
 
 personalized_outreach.csv
 ```
 
 ---
 
-## Step 2
-
-Start FastAPI
-
-```bash
-uvicorn api.app:app --reload
-```
-
-API
-
-```
-http://127.0.0.1:8000
-```
-
----
-
-## Step 3
-
-Launch Streamlit Dashboard
-
-```bash
-streamlit run dashboard/app.py
-```
-
-Dashboard
-
-```
-http://localhost:8501
-```
-
----
-
-# 📊 Outputs
-
-The project generates:
-
-```
-data/output/news_signals.csv
-
-data/output/company_ranking.csv
-
-data/output/personalized_outreach.csv
-```
-
----
-
-# 📡 API Endpoints
+# REST API
 
 ## Home
 
@@ -325,86 +288,93 @@ Returns API status.
 GET /ranking
 ```
 
-Returns ranked companies.
-
 ---
 
-## Signals
+## Intent Signals
 
 ```
 GET /signals
 ```
 
-Returns all collected intent signals.
-
 ---
 
-## Outreach
+## AI Outreach
 
 ```
 GET /outreach
 ```
 
-Returns AI-generated emails and LinkedIn messages.
-
 ---
 
-# 📈 Workflow
+# 🚀 Installation
 
-```
-Sample Accounts CSV
-          │
-          ▼
-Signal Collection
-          │
-          ▼
-Intent Classification
-          │
-          ▼
-Company Scoring
-          │
-          ▼
-Ranking Engine
-          │
-          ▼
-AI Outreach Generation
-          │
-          ▼
-CSV Export
-          │
-          ▼
-FastAPI
-          │
-          ▼
-Streamlit Dashboard
+Clone repository
+
+```bash
+git clone https://github.com/prassu02/clickpost-intent-capture-ai.git
+
+cd clickpost-intent-capture-ai
 ```
 
+Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Create environment
+
+```env
+GROQ_API_KEY=YOUR_KEY
+```
+
+Run Pipeline
+
+```bash
+python main.py
+```
+
+Run FastAPI
+
+```bash
+uvicorn api.app:app --reload
+```
+
+Run Streamlit
+
+```bash
+streamlit run dashboard/app.py
+```
+
 ---
 
-# 📷 Screenshots
+# 🐳 Docker
 
-Add screenshots of:
+Build
 
-- Dashboard Home
-- Company Rankings
-- Intent Signals
-- AI Outreach
-- Charts
+```bash
+docker build -t clickpost-ai .
+```
+
+Run
+
+```bash
+docker run -p 8000:8000 clickpost-ai
+```
 
 ---
 
-# 🔮 Future Improvements
+# 📈 Future Improvements
 
-- LinkedIn Scraper
-- Reddit API Integration
-- NewsAPI Integration
-- Email Automation
-- CRM Integration
-- Lead Recommendation Engine
-- Real-time Scheduler
-- Docker Deployment
-- Cloud Deployment
+- Reddit integration
+- LinkedIn signal extraction
+- Twitter/X integration
+- Real-time scheduling
+- PostgreSQL database
 - Authentication
+- Vector database
+- Multi-agent workflow
+- LangGraph integration
 
 ---
 
@@ -412,18 +382,22 @@ Add screenshots of:
 
 **Prasanna Kumar**
 
-Artificial Intelligence & Data Science Engineer
+AI Engineer | Machine Learning Engineer | Data Scientist
 
-Machine Learning | Generative AI | LLM | FastAPI | Streamlit
+GitHub
 
-GitHub:
 https://github.com/prassu02
 
-LinkedIn:
+LinkedIn
+
 https://www.linkedin.com/in/k-prasanna-kumar/
 
 ---
 
-# 📄 License
+# 📜 License
 
-This project is developed as part of the **ClickPost AI Intern Assignment** and is intended for educational and evaluation purposes.
+MIT License
+
+---
+
+⭐ If you found this project useful, consider giving it a star.
