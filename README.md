@@ -219,7 +219,8 @@ clickpost-intent-capture-ai/
 ├── Dockerfile
 ├── docker-compose.yml
 ├── config.py
-├── main.py                        # Run Complete AI Pipeline
+├── main.py                                                   # Run Complete AI Pipeline
+├── ClickPost_Intent_Capture_AI_Project_Memo.pdf                     
 ├── requirements.txt
 ├── README.md
 ```
