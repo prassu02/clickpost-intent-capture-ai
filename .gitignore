@@ -17,8 +17,6 @@ venv/
 # macOS
 .DS_Store
 
-# CSV Output
-data/output/*.csv
 
 # Logs
 *.log
@@ -28,6 +26,3 @@ data/output/*.csv
 
 # Pytest
 .pytest_cache/
-
-# Jupyter
-.ipynb_checkpoints/
